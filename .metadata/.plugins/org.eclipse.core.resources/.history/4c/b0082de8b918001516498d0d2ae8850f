@@ -1,0 +1,5 @@
+package com.harrythegreat.smsmessaging;
+
+public class SMSReceiver {
+
+}

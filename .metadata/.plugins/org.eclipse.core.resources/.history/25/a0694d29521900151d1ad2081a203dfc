@@ -1,0 +1,142 @@
+package com.harrythegreat.sms_messaging;
+
+import com.harrythegreat.smsmessaging.R;
+
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class Main  extends Activity{
+	
+	String SENT = "SMS_SENT";
+	String DELIVERED = "SMS_DELIVERED";
+	PendingIntent sentPI, deliveredPI;
+	BroadcastReceiver smsSentReceiver, smsDeliveredReceiver;
+	IntentFilter intentFilter;
+	
+	private BroadcastReceiver intentReceiver = new BroadcastReceiver()
+	{
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			TextView SMSes = (TextView) findViewById(R.id.textview1);
+			SMSes.setText(intent.getExtras().getString("sms"));
+			
+		}};
+	
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.main);
+		
+		sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
+		deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+		
+		intentFilter = new IntentFilter();
+		intentFilter.addAction("SMS_RECEIVED_ACTION");
+		
+	}
+	
+	
+	
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		
+		smsSentReceiver = new BroadcastReceiver()
+		{
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				switch(getResultCode())
+				{
+				case Activity.RESULT_OK:
+					Toast.makeText(getApplicationContext(), "SMS Sent", Toast.LENGTH_SHORT).show();
+				break;
+				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+					Toast.makeText(getApplicationContext(), "Generic Failure", Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_NO_SERVICE:
+					Toast.makeText(getApplicationContext(), "No Service", Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_NULL_PDU:
+					Toast.makeText(getApplicationContext(), "Null PDU", Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_RADIO_OFF:
+					Toast.makeText(getApplicationContext(), "Radio Off", Toast.LENGTH_SHORT).show();
+					break;
+				}
+			}};
+			
+			
+			smsDeliveredReceiver = new BroadcastReceiver()
+			{
+
+				@Override
+				public void onReceive(Context context, Intent intent) {
+					switch(getResultCode())
+					{
+					case Activity.RESULT_OK:
+						Toast.makeText(getApplicationContext(), "SMS Delivered", Toast.LENGTH_SHORT).show();
+						break;
+						
+					case Activity.RESULT_CANCELED:
+						Toast.makeText(getApplicationContext(), "SMS is not Delivered", Toast.LENGTH_SHORT).show();
+						break;
+					}
+					
+				}};
+				
+				
+				registerReceiver(smsSentReceiver, new IntentFilter(SENT));
+				registerReceiver(smsDeliveredReceiver, new IntentFilter(DELIVERED));
+				
+				
+	}
+	
+	
+
+
+
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		unregisterReceiver(smsSentReceiver);
+		unregisterReceiver(smsDeliveredReceiver);
+		
+	}
+
+
+
+
+	public void send1(View v)
+	{
+		sendMessage("5556", "Hello my Friend!");
+		
+	}
+
+	private void sendMessage(String string, String string2) {
+		SmsManager smsManager = SmsManager.getDefault();
+		smsManager.sendTextMessage(string, null, string2, sentPI, deliveredPI);
+		
+		
+	}
+	
+	
+
+}

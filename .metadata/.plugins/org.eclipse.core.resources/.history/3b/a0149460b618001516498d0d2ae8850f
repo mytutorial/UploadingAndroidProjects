@@ -1,0 +1,33 @@
+package com.harrythegreat.smsmessaging;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.telephony.SmsManager;
+import android.view.View;
+
+public class Main  extends Activity
+{
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		
+		setContentView(R.layout.main);
+	}
+	
+	public void onClick(View v)
+	{
+		sendSMSMessage("5556", "Hello my friend!!!");
+	}
+
+	private void sendSMSMessage(String string, String string2) {
+
+		SmsManager sms = SmsManager.getDefault();
+		sms.sendTextMessage(string, null, string2, null, null);
+		
+		
+	}
+
+	
+}
